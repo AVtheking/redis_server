@@ -1,6 +1,7 @@
-import { handleExpiry, isPipeline } from ".";
-import { queue } from "./constants";
-import { serializeMessage } from "./serialize";
+import { isPipeline } from "..";
+import { queue } from "../constants";
+import { serializeMessage } from "../resp_protocol/serialize";
+import { handleExpiry } from "./expiry";
 
 //function to handle the set operation
 export function handleSet(parseCommand: unknown): string {

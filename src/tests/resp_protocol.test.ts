@@ -1,7 +1,6 @@
-
 import { expect, test } from "vitest";
-import { deserializeMessage } from "./deserialize";
-import { serializeMessage } from "./serialize";
+import { deserializeMessage } from "../resp_protocol/deserialize";
+import { serializeMessage } from "../resp_protocol/serialize";
 // Test cases for serializeMessage function
 test("Serialize string message", () => {
   expect(serializeMessage("Hello")).toBe("$5\r\nHello\r\n");
@@ -39,7 +38,7 @@ test("Deserialize array message", () => {
   const result = deserializeMessage(
     "*3\r\n$3\r\nSET\r\n$5\r\nmykey\r\n$5\r\nHello\r\n"
   );
-console.log(result)
+  console.log(result);
 
   expect(
     deserializeMessage("*3\r\n$3\r\nSET\r\n$5\r\nmykey\r\n$5\r\nHello\r\n")

@@ -1,4 +1,4 @@
-export function serializeMessage(message: any): string {
+export function serializeMessage(message: unknown): string {
   if (typeof message === "string") {
     return `$${message.length}\r\n${message}\r\n`;
   } else if (typeof message === "number") {

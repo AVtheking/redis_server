@@ -1,33 +1,15 @@
 import net from "net";
-import { dataMap, queue } from "./constants";
-import { deserializeMessage } from "./deserialize";
-import { handleSet } from "./handleSetOperation";
-import { serializeMessage } from "./serialize";
+import { queue } from "./constants";
+import { deserializeMessage } from "./resp_protocol/deserialize";
+import { serializeMessage } from "./resp_protocol/serialize";
 import { operations } from "./type";
+import { handleGet } from "./utils/get";
+import { handleSet } from "./utils/set";
 
 //Variable to check if the command is in pipeline or not
 export let isPipeline = false;
 // function to handle the get operation
-function handleGet(parseCommand: unknown) {
-  const getKey = (parseCommand as string)[1];
 
-  //extract the value from the map
-  const data: { value: string; expiryTime?: number } | undefined =
-    dataMap.get(getKey);
-  //value of the key
-  const keyValue = data?.value;
-  //expiry time of the key
-  const expiryTime = data?.expiryTime;
-
-  if (keyValue && (!expiryTime || expiryTime > Date.now())) {
-    return serializeMessage(keyValue);
-  } else {
-    if (keyValue) {
-      dataMap.delete(getKey);
-    }
-    return serializeMessage(null);
-  }
-}
 // function to handle the exec operation
 function handleExec(): string[] {
   let responses: any = [];
@@ -38,33 +20,7 @@ function handleExec(): string[] {
   return responses;
 }
 
-export function handleExpiry(
-  expiryTimeCommand: string,
-  expiryTimeValue: number,
-  key: string,
-  value: string
-) {
-  if (expiryTimeCommand && expiryTimeValue) {
-    switch (expiryTimeCommand) {
-      //case for the expiry time in seconds
-      case "EX":
-        const ttl = Date.now() + expiryTimeValue * 1000;
-        dataMap.set(key, { value, expiryTime: ttl });
-        break;
-      //case for the expiry time in milliseconds
-      case "PX":
-        const ttlInMilliseconds = Date.now() + expiryTimeValue;
-        dataMap.set(key, { value, expiryTime: ttlInMilliseconds });
-        break;
 
-      default:
-        dataMap.set(key, { value, expiryTime: undefined });
-        break;
-    }
-  } else {
-    dataMap.set(key, { value, expiryTime: undefined });
-  }
-}
 
 //function to handle all operations of redis
 function handleOperaitons(parseCommand: unknown): string {
@@ -123,7 +79,7 @@ const server = net.createServer((socket) => {
     }
     if (Array.isArray(parseCommand)) {
       const response = handleOperaitons(parseCommand);
-      console.log(response);
+      //send response to the client
       socket.write(response);
     }
   });

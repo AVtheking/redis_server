@@ -13,16 +13,13 @@ export function deserializeMessage(message: String): unknown {
     }
     const index = message.indexOf("\r\n") + 2;
     const remMsg = message.slice(index);
-    // console.log(remMsg);
+ 
     const command = remMsg.slice(0, remMsg.indexOf("\r\n"));
-    // console.log(command)
-
     return command;
   }
   //case for the array message
   else if (message.startsWith("*")) {
     const messageLength = parseInt(message.slice(1, message.indexOf("\r\n")));
-    console.log(messageLength);
     let resArr = [];
     let index = message.indexOf("\r\n") + 2;
     let remMsg = message.slice(index);
@@ -32,7 +29,6 @@ export function deserializeMessage(message: String): unknown {
 
       index = remMsg.indexOf("\r\n") + 2;
       remMsg = remMsg.slice(index);
-      console.log(`remMsg: ${remMsg}`);
       index = remMsg.indexOf("\r\n") + 2;
       remMsg = remMsg.slice(index);
     }
