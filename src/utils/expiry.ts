@@ -1,5 +1,6 @@
 import { dataMap } from "../constants";
 
+//implementing functionality of expiry time in O(1) time complexity
 export function handleExpiry(
   expiryTimeCommand: string,
   expiryTimeValue: number,

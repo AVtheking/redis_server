@@ -1,5 +1,7 @@
 import net from "net";
 import { queue } from "./constants";
+import { Decoder } from "./resp_protocol/Decoder";
+import { Encoder } from "./resp_protocol/Encoder";
 import { deserializeMessage } from "./resp_protocol/deserialize";
 import { serializeMessage } from "./resp_protocol/serialize";
 import { operations } from "./type";
@@ -20,8 +22,6 @@ function handleExec(): string[] {
   return responses;
 }
 
-
-
 //function to handle all operations of redis
 function handleOperaitons(parseCommand: unknown): string {
   const operation = (parseCommand as string[])[0].toUpperCase();
@@ -29,7 +29,7 @@ function handleOperaitons(parseCommand: unknown): string {
 
   switch (operation) {
     case operations.ping:
-      operationResponse = serializeMessage("PONG");
+      operationResponse = Encoder.createBulkString("PONG");
       break;
 
     case operations.echo:
@@ -39,21 +39,20 @@ function handleOperaitons(parseCommand: unknown): string {
     case operations.set:
       operationResponse = handleSet(parseCommand);
       break;
+      ``;
 
     case operations.get:
       operationResponse = handleGet(parseCommand);
       break;
 
     case operations.multi:
-      let isPipelineActive = isPipeline;
-      if (isPipelineActive) {
+      if (isPipeline) {
         return serializeMessage("ERR MULTI calls can not be nested");
       }
-      isPipelineActive = true;
+      isPipeline = true;
       operationResponse = serializeMessage("OK");
       break;
 
-    //case for the EXEC command of the pipeline
     case operations.exec:
       if (isPipeline) {
         isPipeline = false;
@@ -69,12 +68,13 @@ function handleOperaitons(parseCommand: unknown): string {
   }
   return operationResponse;
 }
+// const decoder = new Decoder();
 //TCP Server
 const server = net.createServer((socket) => {
   socket.on("data", (data) => {
-    const parseCommand = deserializeMessage(data.toString());
+    const parseCommand = Decoder.parse(data.toString());
     if (parseCommand === null) {
-      const response = serializeMessage("ERROR");
+      const response = Encoder.createBulkString("ERROR");
       socket.write(response);
     }
     if (Array.isArray(parseCommand)) {

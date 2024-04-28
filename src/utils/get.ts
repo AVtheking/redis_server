@@ -1,6 +1,13 @@
 import { dataMap } from "../constants";
 import { serializeMessage } from "../resp_protocol/serialize";
 
+/*
+  * Function to handle the get operation
+  * @param parseCommand - the parsed command
+  * @returns if the key is present and is not expired then return the value of the key
+  
+*/
+
 export function handleGet(parseCommand: unknown) {
   const getKey = (parseCommand as string)[1];
 

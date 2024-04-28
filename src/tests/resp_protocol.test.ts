@@ -1,75 +1,75 @@
 import { expect, test } from "vitest";
-import { deserializeMessage } from "../resp_protocol/deserialize";
-import { serializeMessage } from "../resp_protocol/serialize";
+import { Decoder } from "../resp_protocol/Decoder";
+import { Encoder } from "../resp_protocol/Encoder";
 // Test cases for serializeMessage function
 test("Serialize string message", () => {
-  expect(serializeMessage("Hello")).toBe("$5\r\nHello\r\n");
+  expect(Encoder.createBulkString("Hello")).toBe("$5\r\nHello\r\n");
 });
 
 test("Serialize number message", () => {
-  expect(serializeMessage(123)).toBe(":123\r\n");
+  expect(Encoder.createInteger(123)).toBe(":123\r\n");
 });
 
 test("Serialize null message", () => {
-  expect(serializeMessage(null)).toBe("$-1\r\n");
+  expect(Encoder.createErrorMessage(null)).toBe("$-1\r\n");
 });
 
 test("Serialize array message", () => {
-  expect(serializeMessage(["SET", "mykey", "Hello"])).toBe(
-    "*3\r\n$3\r\nSET\r\n$5\r\nmykey\r\n$5\r\nHello\r\n"
-  );
+  expect(
+    Encoder.createArray(["$3\r\nSET\r\n", "$5\r\nmykey\r\n", "$5\r\nHello\r\n"])
+  ).toBe("*3\r\n$3\r\nSET\r\n$5\r\nmykey\r\n$5\r\nHello\r\n");
 });
 
 // Test cases for deserializeMessage function
 test("Deserialize string message", () => {
-  expect(deserializeMessage("+OK\r\n")).toBe("OK");
+  expect(Decoder.parse("+OK\r\n")).toBe("OK");
 });
 
 test("Deserialize number message", () => {
-  const result = deserializeMessage(":123\r\n");
-  expect(deserializeMessage(":123\r\n")).toBe(123);
+  const result = Decoder.parse(":123\r\n");
+  expect(Decoder.parse(":123\r\n")).toBe(123);
 });
 
 test("Deserialize null message", () => {
-  expect(deserializeMessage("$-1\r\n")).toBeNull();
+  expect(Decoder.parse("$-1\r\n")).toBeNull();
 });
 
 test("Deserialize array message", () => {
-  const result = deserializeMessage(
+  const result = Decoder.parse(
     "*3\r\n$3\r\nSET\r\n$5\r\nmykey\r\n$5\r\nHello\r\n"
   );
   console.log(result);
 
   expect(
-    deserializeMessage("*3\r\n$3\r\nSET\r\n$5\r\nmykey\r\n$5\r\nHello\r\n")
+    Decoder.parse("*3\r\n$3\r\nSET\r\n$5\r\nmykey\r\n$5\r\nHello\r\n")
   ).toEqual(["SET", "mykey", "Hello"]);
 });
 test("Deserialize invalid message format", () => {
   // Test with an invalid message format (missing prefix)
-  expect(() => deserializeMessage("Invalid message")).toThrowError(
+  expect(() => Decoder.parse("Invalid message")).toThrowError(
     "Invalid RESP message format"
   );
 });
 
 test("Deserialize unknown message type", () => {
   // Test with an unknown message type (unsupported prefix)
-  expect(() => deserializeMessage("@Unknown\r\n")).toThrowError(
+  expect(() => Decoder.parse("@Unknown\r\n")).toThrowError(
     "Invalid RESP message format"
   );
 });
 
 test("Deserialize invalid array message", () => {
   // Test with an invalid array message (missing elements)
-  expect(() => deserializeMessage("*2\r\n$3\r\nSET\r\n")).toThrowError(
+  expect(() => Decoder.parse("*2\r\n$3\r\nSET\r\n")).toThrowError(
     "Invalid RESP message format"
   );
 });
 
 // Test cases for invalid serialization
 
-test("Serialize unsupported data type", () => {
-  // Test with an unsupported data type for serialization
-  expect(() => serializeMessage({ key: "value" })).toThrowError(
-    `Cannot serialize message`
-  );
-});
+// test("Serialize unsupported data type", () => {
+//   // Test with an unsupported data type for serialization
+//   expect(() => Encoder.({ key: "value" })).toThrowError(
+//     `Cannot serialize message`
+//   );
+// });
