@@ -1,7 +1,8 @@
 export class Encoder {
   //parent method to encode the message
   //encapuslating and abstracting the encoding logic
-  static encode(message: string) {
+  //TODO: need to implement better type system here
+  static encode(message: any) {
     //separate case for the message "Ok"
     //it is encoded as a simple string
     if (message === "Ok") {

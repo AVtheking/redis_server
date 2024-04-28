@@ -3,20 +3,20 @@ import { Decoder } from "../resp_protocol/Decoder";
 import { Encoder } from "../resp_protocol/Encoder";
 // Test cases for serializeMessage function
 test("Serialize string message", () => {
-  expect(Encoder.createBulkString("Hello")).toBe("$5\r\nHello\r\n");
+  expect(Encoder.encode("Hello")).toBe("$5\r\nHello\r\n");
 });
 
 test("Serialize number message", () => {
-  expect(Encoder.createInteger(123)).toBe(":123\r\n");
+  expect(Encoder.encode(123)).toBe(":123\r\n");
 });
 
 test("Serialize null message", () => {
-  expect(Encoder.createErrorMessage(null)).toBe("$-1\r\n");
+  expect(Encoder.encode(null)).toBe("$-1\r\n");
 });
 
 test("Serialize array message", () => {
   expect(
-    Encoder.createArray(["$3\r\nSET\r\n", "$5\r\nmykey\r\n", "$5\r\nHello\r\n"])
+    Encoder.encode(["$3\r\nSET\r\n", "$5\r\nmykey\r\n", "$5\r\nHello\r\n"])
   ).toBe("*3\r\n$3\r\nSET\r\n$5\r\nmykey\r\n$5\r\nHello\r\n");
 });
 

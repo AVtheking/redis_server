@@ -2,8 +2,7 @@ import net from "net";
 import { queue } from "./constants";
 import { Decoder } from "./resp_protocol/Decoder";
 import { Encoder } from "./resp_protocol/Encoder";
-import { deserializeMessage } from "./resp_protocol/deserialize";
-import { serializeMessage } from "./resp_protocol/serialize";
+
 import { operations } from "./type";
 import { handleGet } from "./utils/get";
 import { handleSet } from "./utils/set";
@@ -17,7 +16,7 @@ function handleExec(): string[] {
   let responses: any = [];
   queue.forEach((command: string[]) => {
     const response = handleOperaitons(command);
-    responses.push(deserializeMessage(response));
+    responses.push(Decoder.parse(response));
   });
   return responses;
 }
@@ -29,11 +28,11 @@ function handleOperaitons(parseCommand: unknown): string {
 
   switch (operation) {
     case operations.ping:
-      operationResponse = Encoder.createBulkString("PONG");
+      operationResponse = Encoder.encode("PONG");
       break;
 
     case operations.echo:
-      operationResponse = serializeMessage((parseCommand as string[])[1]);
+      operationResponse = Encoder.encode((parseCommand as string[])[1]);
       break;
 
     case operations.set:
@@ -47,22 +46,22 @@ function handleOperaitons(parseCommand: unknown): string {
 
     case operations.multi:
       if (isPipeline) {
-        return serializeMessage("ERR MULTI calls can not be nested");
+        return Encoder.encode("ERR MULTI calls can not be nested");
       }
       isPipeline = true;
-      operationResponse = serializeMessage("OK");
+      operationResponse = Encoder.encode("OK");
       break;
 
     case operations.exec:
       if (isPipeline) {
         isPipeline = false;
         const responses = handleExec();
-        operationResponse = serializeMessage(responses);
+        operationResponse = Encoder.encode(responses);
         console.log(operationResponse);
         break;
       }
     default:
-      operationResponse = serializeMessage("ERROR");
+      operationResponse = Encoder.encode("ERROR");
 
       break;
   }
@@ -74,7 +73,7 @@ const server = net.createServer((socket) => {
   socket.on("data", (data) => {
     const parseCommand = Decoder.parse(data.toString());
     if (parseCommand === null) {
-      const response = Encoder.createBulkString("ERROR");
+      const response = Encoder.encode("ERROR");
       socket.write(response);
     }
     if (Array.isArray(parseCommand)) {
