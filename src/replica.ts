@@ -48,8 +48,6 @@ export class ReplicaInstance {
             console.log(`response from master: ${response}`);
           }
         }
-
-        // console.log(response);
       });
 
       replica.on("end", () => {
