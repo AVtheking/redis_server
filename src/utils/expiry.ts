@@ -8,6 +8,8 @@ export function handleExpiry(
   value: string
 ) {
   if (expiryTimeCommand && expiryTimeValue) {
+    expiryTimeCommand.toUpperCase();
+    
     switch (expiryTimeCommand) {
       //case for the expiry time in seconds
       case "EX":

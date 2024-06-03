@@ -23,6 +23,7 @@ export class Encoder {
         if (message === null) {
           return this.createErrorMessage(null);
         } else if (Array.isArray(message)) {
+          console.log(message);
           return this.createArray(message);
         } else {
           throw new Error(`Cannot serialize message `);
@@ -44,6 +45,11 @@ export class Encoder {
     return `:${message}\r\n`;
   }
   static createArray(arr: Array<string>) {
-    return `*${arr.length}\r\n${arr.join("")}`;
+    let response = `*${arr.length}\r\n`;
+    for (const item of arr) {
+      response += this.encode(item);
+    }
+   
+    return response;
   }
 }

@@ -1,5 +1,5 @@
 import { dataMap } from "../constants";
-import { serializeMessage } from "../resp_protocol/serialize";
+import { Encoder } from "../resp_protocol/Encoder";
 
 /*
   * Function to handle the get operation
@@ -21,12 +21,12 @@ export function handleGet(parseCommand: unknown) {
 
   //if the key is present and is not yet expired
   if (keyValue && (!expiryTime || expiryTime > Date.now())) {
-    return serializeMessage(keyValue);
+    return Encoder.encode(keyValue);
   } else {
     //if the key is expired then delete it from the cache
     if (keyValue) {
       dataMap.delete(getKey);
     }
-    return serializeMessage(null);
+    return Encoder.encode(null);
   }
 }

@@ -16,10 +16,10 @@ export class Decoder {
 
       case "$":
         return this.readBulkString(message);
-      
+
       case "*":
         return this.readArray(message);
-      
+
       default:
         throw new Error("Invalid RESP message format");
     }

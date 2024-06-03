@@ -1,3 +1,5 @@
+import { info } from "console";
+
 export const operations = {
   set: "SET",
   get: "GET",
@@ -9,4 +11,12 @@ export const operations = {
   ping: "PING",
   multi: "MULTI",
   exec: "EXEC",
+  info: "INF",
+  replconf: "REPLCONF",
+  psync: "PSYNC",
+};
+
+export type database = {
+  value: string;
+  expiryTime: number | undefined;
 };

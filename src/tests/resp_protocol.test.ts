@@ -15,9 +15,9 @@ test("Serialize null message", () => {
 });
 
 test("Serialize array message", () => {
-  expect(
-    Encoder.encode(["$3\r\nSET\r\n", "$5\r\nmykey\r\n", "$5\r\nHello\r\n"])
-  ).toBe("*3\r\n$3\r\nSET\r\n$5\r\nmykey\r\n$5\r\nHello\r\n");
+  const response = Encoder.encode(["SET", "mykey", "Hello"]);
+
+  expect(response).toBe("*3\r\n$3\r\nSET\r\n$5\r\nmykey\r\n$5\r\nHello\r\n");
 });
 
 // Test cases for deserializeMessage function
@@ -64,12 +64,3 @@ test("Deserialize invalid array message", () => {
     "Invalid RESP message format"
   );
 });
-
-// Test cases for invalid serialization
-
-// test("Serialize unsupported data type", () => {
-//   // Test with an unsupported data type for serialization
-//   expect(() => Encoder.({ key: "value" })).toThrowError(
-//     `Cannot serialize message`
-//   );
-// });
