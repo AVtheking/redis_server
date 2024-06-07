@@ -16,7 +16,7 @@ export const operations = {
   psync: "PSYNC",
 };
 
-export type database = {
-  value: string;
-  expiryTime: number | undefined;
-};
+export type Database = Map<
+  string,
+  { value: string; expiryTime: number | undefined }
+>;

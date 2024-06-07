@@ -4,10 +4,10 @@ import { queue } from "../constants";
 import { Encoder } from "../resp_protocol/Encoder";
 
 import { handleExpiry } from "./expiry";
+import { Database } from "../type";
 
 //function to handle the set operation
-export function handleSet(parseCommand: unknown): string {
-  console.log(parseCommand);
+export function handleSet(parseCommand: unknown, dataStore: Database): string {
   if (isPipeline) {
     const array = parseCommand as string[];
 
@@ -22,11 +22,10 @@ export function handleSet(parseCommand: unknown): string {
   const value = (parseCommand as string)[2];
   const expiryTimeCommand = (parseCommand as string)[3];
 
-
   const expiryTimeValue: number = parseInt((parseCommand as string)[4]);
-  
+
   //function to handle the case for the expiry time
-  handleExpiry(expiryTimeCommand, expiryTimeValue, key, value);
+  handleExpiry(expiryTimeCommand, expiryTimeValue, key, value, dataStore);
   replicaConnection.forEach((connection) => {
     connection.write(Encoder.encode(parseCommand));
   });

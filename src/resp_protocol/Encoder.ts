@@ -23,7 +23,7 @@ export class Encoder {
         if (message === null) {
           return this.createErrorMessage(null);
         } else if (Array.isArray(message)) {
-          console.log(message);
+     
           return this.createArray(message);
         } else {
           throw new Error(`Cannot serialize message `);

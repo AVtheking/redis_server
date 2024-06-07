@@ -1,32 +1,33 @@
-import { dataMap } from "../constants";
+import { Database } from "../type";
 
 //implementing functionality of expiry time in O(1) time complexity
 export function handleExpiry(
   expiryTimeCommand: string,
   expiryTimeValue: number,
   key: string,
-  value: string
+  value: string,
+  dataStore: Database
 ) {
   if (expiryTimeCommand && expiryTimeValue) {
     expiryTimeCommand.toUpperCase();
-    
+
     switch (expiryTimeCommand) {
       //case for the expiry time in seconds
       case "EX":
         const ttl = Date.now() + expiryTimeValue * 1000;
-        dataMap.set(key, { value, expiryTime: ttl });
+        dataStore.set(key, { value, expiryTime: ttl });
         break;
       //case for the expiry time in milliseconds
       case "PX":
         const ttlInMilliseconds = Date.now() + expiryTimeValue;
-        dataMap.set(key, { value, expiryTime: ttlInMilliseconds });
+        dataStore.set(key, { value, expiryTime: ttlInMilliseconds });
         break;
 
       default:
-        dataMap.set(key, { value, expiryTime: undefined });
+        dataStore.set(key, { value, expiryTime: undefined });
         break;
     }
   } else {
-    dataMap.set(key, { value, expiryTime: undefined });
+    dataStore.set(key, { value, expiryTime: undefined });
   }
 }
