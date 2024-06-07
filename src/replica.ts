@@ -50,8 +50,15 @@ export class ReplicaInstance {
           replica.write(Encoder.encode(["PSYNC", "?", "-1"]));
         } else if (Array.isArray(response)) {
           if (writeCommands.has(response[0])) {
+            console.log(
+              `\x1b[33m Recived write command ${response[0]} from master\x1b[0m`
+            );
             handleOperaitons(response, replica, this.store);
           }
+        } else {
+          console.log(
+            `\x1b[35m Recived RDB file: ${response} from master\x1b[0m`
+          );
         }
       });
 

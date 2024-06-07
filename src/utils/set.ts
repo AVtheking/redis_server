@@ -1,10 +1,11 @@
 import { connect } from "node:http2";
-import { isPipeline, replicaConnection } from "..";
+import { isPipeline } from "..";
 import { queue } from "../constants";
 import { Encoder } from "../resp_protocol/Encoder";
 
 import { handleExpiry } from "./expiry";
 import { Database } from "../type";
+import { Master } from "../master";
 
 //function to handle the set operation
 export function handleSet(parseCommand: unknown, dataStore: Database): string {
@@ -26,7 +27,7 @@ export function handleSet(parseCommand: unknown, dataStore: Database): string {
 
   //function to handle the case for the expiry time
   handleExpiry(expiryTimeCommand, expiryTimeValue, key, value, dataStore);
-  replicaConnection.forEach((connection) => {
+  Master.replicaConnection.forEach((connection) => {
     connection.write(Encoder.encode(parseCommand));
   });
   return Encoder.encode("OK");

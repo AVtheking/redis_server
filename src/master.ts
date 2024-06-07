@@ -12,6 +12,7 @@ export class Master {
   offset: number;
   masterInfo: string[];
   dataStore: Database;
+  static replicaConnection: net.Socket[] = [];
 
   constructor(
     port: number,
@@ -24,6 +25,7 @@ export class Master {
     this.offset = offset;
     this.masterInfo = masterInfo;
     this.dataStore = new Map();
+    // this.replicaConnection = [];
   }
 
   initializeMaster() {

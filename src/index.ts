@@ -17,12 +17,13 @@ export let isPipeline = false;
 const args = process.argv;
 let role = "master";
 let port = 6379;
-let master: string;
+let master: Master;
+let replica: ReplicaInstance;
+let masterHost: string;
 let masterPort: number;
 let replicationId = "8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb";
 let offset = 0;
 let masterInfo: string[] = [];
-export const replicaConnection: net.Socket[] = [];
 
 for (let i = 0; i < args.length; i++) {
   switch (args[i]) {
@@ -43,14 +44,14 @@ for (let i = 0; i < args.length; i++) {
 //*extracting the address and port of the master
 
 if (role === "slave") {
-  master = masterInfo[0];
+  masterHost = masterInfo[0];
   masterPort = parseInt(masterInfo[1]);
 
-  const replica = new ReplicaInstance(master, masterPort, port);
+  replica = new ReplicaInstance(masterHost, masterPort, port);
 
   replica.initiateHandshake();
 } else if (role === "master") {
-  const master = new Master(port, replicationId, offset, masterInfo);
+  master = new Master(port, replicationId, offset, masterInfo);
 
   master.initializeMaster();
 }
@@ -133,7 +134,8 @@ export function handleOperaitons(
     case operations.psync:
       console.log(`\x1b[33mACK PSYNC\x1b[0m`);
       operationResponse = Encoder.encode(`FULLRESYNC ${replicationId} 0`);
-      replicaConnection.push(connection);
+      Master.replicaConnection.push(connection);
+
       break;
 
     default:
